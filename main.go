@@ -78,9 +78,6 @@ Outer:
 	}
 	for _, testName := range testOrder {
 		tr := mp[testName]
-		if len(tr.lines) == 0 {
-			continue
-		}
 		sprint := fmt.Sprintf
 		if tr.finalAction == "pass" {
 			sprint = func(format string, a ...interface{}) string {
@@ -92,6 +89,9 @@ Outer:
 			}
 		}
 		fmt.Printf("::group::%s\n", sprint(tr.name))
+		if len(tr.lines) == 0 {
+			fmt.Println("All tests have passed")
+		}
 		for _, line := range tr.lines {
 			fmt.Print(line)
 		}
