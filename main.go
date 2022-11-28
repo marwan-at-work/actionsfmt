@@ -51,7 +51,10 @@ Outer:
 			mp[te.Test] = &testRun{name: te.Test}
 			continue
 		}
-		tr := mp[te.Test]
+		tr, ok := mp[te.Test]
+		if !ok {
+			continue
+		}
 		switch te.Action {
 		case "output":
 			trimmed := strings.TrimSpace(te.Output)
@@ -74,6 +77,8 @@ Outer:
 		case "fail":
 			failed = true
 			tr.finalAction = "fail"
+		case "skip":
+			tr.finalAction = "skip"
 		}
 	}
 	for _, testName := range testOrder {
@@ -86,6 +91,10 @@ Outer:
 		} else if tr.finalAction == "fail" {
 			sprint = func(format string, a ...interface{}) string {
 				return aurora.Red(fmt.Sprintf(format, a...)).String()
+			}
+		} else if tr.finalAction == "skip" {
+			sprint = func(format string, a ...interface{}) string {
+				return aurora.Yellow(fmt.Sprintf(format, a...)).String()
 			}
 		}
 		fmt.Printf("::group::%s\n", sprint(tr.name))
